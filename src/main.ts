@@ -31,6 +31,6 @@ async function bootstrap() {
   //   methods: ['POST', 'PUT', 'DELETE', 'GET'],
   // });
   app.use(cors());
-  await app.listen(3000);
+  await app.listen(process.env.PORT);
 }
 bootstrap();
