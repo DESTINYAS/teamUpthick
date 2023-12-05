@@ -33,4 +33,8 @@ export class AuthService {
       accessToken: this.jwtService.sign({ userId: user.id, role: user.role }),
     };
   }
+  async createUser(username: string, password: string,role:string): Promise<any>{
+    const data = {username,password,role}
+  const user = await this.prisma.user.create({data})
+  }
 }

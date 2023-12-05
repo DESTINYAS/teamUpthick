@@ -12,3 +12,19 @@ export class LoginDto {
   @ApiProperty()
   password: string;
 }
+export class createU {
+  @IsNotEmpty()
+  @ApiProperty()
+  username: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  @ApiProperty()
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  role: string;
+}

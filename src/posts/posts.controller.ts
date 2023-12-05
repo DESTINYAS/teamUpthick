@@ -9,11 +9,26 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   Query,
+  UploadedFile,
+  ParseFilePipe,
+  UsePipes,
+  ValidationPipe,
+  UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -21,15 +36,24 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UsePipes(new ValidationPipe())
+  @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Create a new post' })
-  @ApiBody({ type: CreatePostDto })
-  @ApiResponse({
-    status: 201,
-    description: 'Post created successfully',
-    type: Post,
-  })
-  async createPost(@Body() createPostDto: CreatePostDto) {
-    return this.postsService.create(createPostDto);
+  
+  async createPost(
+    @Body() createPostDto: CreatePostDto,
+    @UploadedFile(new ParseFilePipe({ validators: [] }))
+    file: Express.Multer.File,
+  ) {
+    console.log({tags:createPostDto.tags});
+    return this.postsService.create(
+      createPostDto,
+      file.originalname,
+      file.buffer,
+    );
   }
 
   @Get()
@@ -55,7 +79,23 @@ export class PostsController {
     return this.postsService.findOnePost({ id: +id });
   }
 
+  @Get('/published')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getPublishedPosts() {
+    return this.postsService.getPublishedPosts();
+  }
+
+  @Get('/drafts')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getDraftPosts() {
+    return this.postsService.getDraftPosts();
+  }
+
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'update a  post' })
   @ApiResponse({
     status: 200,
@@ -69,6 +109,8 @@ export class PostsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'delete sa post' })
   @ApiResponse({
     type: 'Post deleted successfully',

@@ -7,12 +7,12 @@ import {
   IsNumber,
   IsPhoneNumber,
 } from 'class-validator';
-// enum EntityType {
-//   Job = 'job',
-//   Program = 'program',
-// }
+enum EntityType {
+  Job = 'job',
+  Program = 'program',
+}
 
-export class CreateApplicationDto {
+export class CreateJobApplicationDto {
   @IsNotEmpty()
   @ApiProperty()
   firstname: string;
@@ -74,8 +74,15 @@ export class CreateApplicationDto {
   @ApiProperty({ required: false })
   fellowshipInfo: string;
 
-  @ApiProperty({ required: false,default:"Newbie" })
+  @ApiProperty({ required: false })
   resume: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: true,
+  })
+  file: File;
 
   @ApiProperty({ required: false })
   programPreferenceID: number;
@@ -87,6 +94,7 @@ export class CreateApplicationDto {
   status: string = 'pending';
 
   @IsNotEmpty()
-  @ApiProperty({ default: 'program' })
+  // @ApiProperty({ enum: EntityType, default: EntityType.Program })
+  @ApiProperty({ default: 'job' })
   type: string;
 }

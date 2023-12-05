@@ -9,11 +9,14 @@ import {
 
 import { AppModule } from './app.module';
 import * as cors from 'cors';
+import { HttpExceptionFilter } from './GlobalErrorHandler';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe({}));
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   const config = new DocumentBuilder()
@@ -31,6 +34,6 @@ async function bootstrap() {
   //   methods: ['POST', 'PUT', 'DELETE', 'GET'],
   // });
   app.use(cors());
-  await app.listen(process.env.PORT);
+  await app.listen(3000);
 }
 bootstrap();
