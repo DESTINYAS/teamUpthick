@@ -29,8 +29,8 @@ export class CreatePostDto {
   @ApiProperty({type:'boolean',required:false})
   published: boolean;
 
-  @ApiProperty({ type: [String], default: [],isArray: true,required:false})
-  tags: string[]=[];
+  @ApiProperty({ type: [String],required:false})
+  tags: string[]
 
   @IsDate()
   @ApiProperty()
